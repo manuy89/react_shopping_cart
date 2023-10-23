@@ -85,4 +85,33 @@ class BasePage:
         else:
             return True
         
+    def wait_for_element_to_be_invisible(self, locator, *, timeout=6):
+        try:
+            wait = WebDriverWait(self.driver, timeout=timeout)
+            wait.until(expected_conditions.invisibility_of_element(locator))
+        except TimeoutError:
+            return False
+        else:
+            return True
+        
+    def wait_for_element_to_be_clickable(self, locator, *, timeout=6):
+        try:
+            wait = WebDriverWait(self.driver, timeout=timeout)
+            wait.until(expected_conditions.element_to_be_clickable(locator))
+        except TimeoutError:
+            return False
+        else:
+            return True
+        
+    def wait_for_text_to_be_present(self, locator, text, *, timeout=6):
+        try:
+            wait = WebDriverWait(self.driver, timeout=timeout)
+            wait.until(expected_conditions.text_to_be_present_in_element(locator, text))
+        except TimeoutError:
+            return False
+        return True
+        
+
+        
+        
     

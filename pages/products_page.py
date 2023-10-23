@@ -18,6 +18,7 @@ class ProductsPage(BasePage):
     plus_icon_cart = (By.XPATH, "//button[normalize-space()='+'][1]")
     remove_items = (By.XPATH, "//button[@title='remove product from cart']")
     checkout = (By.XPATH, "//button[normalize-space()='Checkout']")
+    cart = (By.XPATH, "//span[normalize-space()='Cart']")
 
 
     def __init__(self, driver):
@@ -26,7 +27,7 @@ class ProductsPage(BasePage):
     def click_size(self, size):
         self.wait_for_initial_load(self.products_count)
         text_before = self.get_text(self.products_count)
-        print(f"text_before: {text_before}")
+        # print(f"text_before: {text_before}")
         self.click((By.XPATH, "//span[text()='"+ size +"']"))
         self.wait_for_text_to_change(self.products_count, text_before) 
 
@@ -44,9 +45,11 @@ class ProductsPage(BasePage):
         for product in self.get_elements(self.products_free_shipping):
             if count_of_items_added < no_of_items_to_add:
                 product.find_element(By.XPATH, 'parent::div/button').click()
+                # self.wait_for_element_to_be_clickable(self.close_cart_button)
                 time.sleep(1)
-                count_of_items_added += 1
+                # self.wait_for_text_to_be_present(self.cart_subtotal, '$')
                 self.click(self.close_cart_button)
+                count_of_items_added += 1
                 time.sleep(1)
             else:
                 break
@@ -57,55 +60,58 @@ class ProductsPage(BasePage):
         for product in self.get_elements(self.all_products):
             if not product.find_element(By.XPATH, 'child::div').text and count_of_items_added < no_of_items_to_add:
                 product.find_element(By.XPATH, 'button').click()
+                # self.wait_for_element_to_be_clickable(self.close_cart_button)
                 time.sleep(1)
                 self.click(self.close_cart_button)
                 count_of_items_added += 1
                 time.sleep(1)
               
     def no_of_items_in_cart(self):
-        time.sleep(2)
+        time.sleep(1)
         return int(self.get_text(self.cart_quantity))
     
     def list_of_items_in_cart(self):
         items_list = []
         self.click(self.cart_button)
-        time.sleep(4)
+        time.sleep(1)
         for item in self.get_elements(self.all_cart_items):
             item_name = item.find_element(By.XPATH, "div[1]/p[1]").text
             item_price = item.find_element(By.XPATH, 'div[2]/p').text
             items_list.append((item_name, item_price))
         self.click(self.close_cart_button)
-        time.sleep(2)
+        time.sleep(1)
 
         return items_list
     
     def get_cart_subtotal(self):
+        self.wait_for_element_to_be_clickable(self.cart_button)
         self.click(self.cart_button)
-        time.sleep(4)
+        time.sleep(1)
         subtotal = self.get_text(self.cart_subtotal)
         self.click(self.close_cart_button)
-        time.sleep(2)
+        time.sleep(1)
         return subtotal
     
     
     def increase_quantity_from_cart(self):
+        self.wait_for_element_to_be_clickable(self.cart_button)
         self.click(self.cart_button)
-        time.sleep(4)
+        time.sleep(1)
         self.click(self.plus_icon_cart)
         self.click(self.close_cart_button)
-        time.sleep(2)
+        time.sleep(1)
 
     def remove_all_items_from_cart(self):
         self.click(self.cart_button)
-        time.sleep(4)
+        time.sleep(1)
         for item in self.get_elements(self.remove_items):
             item.click()
         self.click(self.close_cart_button)
-        time.sleep(4)
+        time.sleep(1)
 
     def cart_checkout(self):
         self.click(self.cart_button)
-        time.sleep(4)
+        time.sleep(1)
         self.click(self.checkout)
         if self.wait_for_alert():
             alert = self.driver.switch_to.alert
