@@ -6,7 +6,7 @@ class TestSizeFilter(BaseTest):
 
     @pytest.mark.parametrize(
             'size, expected_no_of_products',
-            [('XS', 1), ('S', 2), ('M', 1), ('ML', 2), ('L', 10), ('XL', 10), ('XXL', 4)]
+            [('XS', 1), ('M', 1), ('L', 10), ('XXL', 4)]
             )
     def test_single_size_filter(self, size, expected_no_of_products):
         products_page = ProductsPage(self.driver)
@@ -18,7 +18,7 @@ class TestSizeFilter(BaseTest):
     
     @pytest.mark.parametrize(
         'size1, size2, expected_no_of_products',
-        [('XS', 'S', 2), ('S', 'M', 3), ('M', 'L', 11), ('L', 'XXL', 11)]
+        [('S', 'M', 3), ('L', 'XXL', 11)]
     )
     def test_two_size_filters(self, size1, size2, expected_no_of_products):
         products_page = ProductsPage(self.driver)

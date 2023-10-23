@@ -45,7 +45,7 @@ class BasePage:
 
         def __call__(self, driver):
             actual_text = driver.find_element(*self.locator).text
-            print(f'actual_text:{actual_text}')
+            # print(f'actual_text:{actual_text}')
             return self.text != actual_text
         
         
@@ -64,7 +64,7 @@ class BasePage:
 
         def __call__(self, driver):
             num_of_products = int(driver.find_element(*self.locator).text.split()[0])
-            print(f'no of products in initial load: {num_of_products}')
+            # print(f'no of products in initial load: {num_of_products}')
             return num_of_products > 0
         
     def wait_for_initial_load(self, locator, *, timeout=5):
@@ -75,3 +75,14 @@ class BasePage:
             return False
         else:
             return True    
+        
+    def wait_for_alert(self, *, timeout=4):
+        try:
+            wait = WebDriverWait(self.driver, timeout)
+            wait.until(expected_conditions.alert_is_present())
+        except TimeoutError:
+            return False
+        else:
+            return True
+        
+    
