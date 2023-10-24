@@ -25,7 +25,16 @@ class TestCartDelete:
     cart_quantity = 4
     cart_subtotal_after_delete = '$ 0.00'
     cart_quantity_after_delete = 0
+
+
+class TestDataRemoveMaxPriceItem:
+    items_expected_in_cart = [('Cropped Stay Groovy off white', '$ 10.90'), 
+                             ('Basic Cactus White T-shirt', '$ 13.25'),
+                              ('Black Tule Oversized', '$ 29.45')]
     
+    cart_quantity = 3
+    
+    cart_quantity_after_remove = 2
 
 
 

@@ -33,6 +33,8 @@ class BasePage:
             wait = WebDriverWait(self.driver, timeout)
             wait.until(expected_conditions.presence_of_element_located(locator))
             
+            # wait.until(expected_conditions.)
+
         except TimeoutError:
             return False
         else:
@@ -64,7 +66,6 @@ class BasePage:
 
         def __call__(self, driver):
             num_of_products = int(driver.find_element(*self.locator).text.split()[0])
-            # print(f'no of products in initial load: {num_of_products}')
             return num_of_products > 0
         
     def wait_for_initial_load(self, locator, *, timeout=5):

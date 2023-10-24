@@ -1,5 +1,6 @@
 from .base_page import BasePage
 from selenium.webdriver.common.by import By
+from selenium.webdriver import ActionChains
 import time
 
 
@@ -19,6 +20,9 @@ class ProductsPage(BasePage):
     remove_items = (By.XPATH, "//button[@title='remove product from cart']")
     checkout = (By.XPATH, "//button[normalize-space()='Checkout']")
     cart = (By.XPATH, "//span[normalize-space()='Cart']")
+    subtotal_text = (By.XPATH, "//p[normalize-space()='SUBTOTAL']")
+
+    new_cart_quantity = (By.XPATH, "//span[normalize-space()='Cart']//parent::div/div/div")
 
 
     def __init__(self, driver):
@@ -27,7 +31,6 @@ class ProductsPage(BasePage):
     def click_size(self, size):
         self.wait_for_initial_load(self.products_count)
         text_before = self.get_text(self.products_count)
-        # print(f"text_before: {text_before}")
         self.click((By.XPATH, "//span[text()='"+ size +"']"))
         self.wait_for_text_to_change(self.products_count, text_before) 
 
@@ -45,11 +48,11 @@ class ProductsPage(BasePage):
         for product in self.get_elements(self.products_free_shipping):
             if count_of_items_added < no_of_items_to_add:
                 product.find_element(By.XPATH, 'parent::div/button').click()
-                # self.wait_for_element_to_be_clickable(self.close_cart_button)
+                # self.wait_for_element_to_be_clickable(self.remove_items)
                 time.sleep(1)
-                # self.wait_for_text_to_be_present(self.cart_subtotal, '$')
                 self.click(self.close_cart_button)
                 count_of_items_added += 1
+                # self.wait_for_element_to_be_invisible(self.subtotal_text)
                 time.sleep(1)
             else:
                 break
@@ -60,7 +63,7 @@ class ProductsPage(BasePage):
         for product in self.get_elements(self.all_products):
             if not product.find_element(By.XPATH, 'child::div').text and count_of_items_added < no_of_items_to_add:
                 product.find_element(By.XPATH, 'button').click()
-                # self.wait_for_element_to_be_clickable(self.close_cart_button)
+                # self.wait_for_element_to_be_clickable(self.remove_items)
                 time.sleep(1)
                 self.click(self.close_cart_button)
                 count_of_items_added += 1
@@ -72,7 +75,9 @@ class ProductsPage(BasePage):
     
     def list_of_items_in_cart(self):
         items_list = []
+        time.sleep(1)
         self.click(self.cart_button)
+        # self.wait_for_element_to_be_clickable(self.remove_items)
         time.sleep(1)
         for item in self.get_elements(self.all_cart_items):
             item_name = item.find_element(By.XPATH, "div[1]/p[1]").text
@@ -86,6 +91,7 @@ class ProductsPage(BasePage):
     def get_cart_subtotal(self):
         self.wait_for_element_to_be_clickable(self.cart_button)
         self.click(self.cart_button)
+        # self.wait_for_element_to_be_clickable(self.checkout)
         time.sleep(1)
         subtotal = self.get_text(self.cart_subtotal)
         self.click(self.close_cart_button)
@@ -94,8 +100,10 @@ class ProductsPage(BasePage):
     
     
     def increase_quantity_from_cart(self):
-        self.wait_for_element_to_be_clickable(self.cart_button)
+        # self.wait_for_element_to_be_clickable(self.cart_button)
+        time.sleep(1)
         self.click(self.cart_button)
+        # self.wait_for_element_to_be_clickable(self.remove_items)
         time.sleep(1)
         self.click(self.plus_icon_cart)
         self.click(self.close_cart_button)
@@ -103,6 +111,7 @@ class ProductsPage(BasePage):
 
     def remove_all_items_from_cart(self):
         self.click(self.cart_button)
+        # self.wait_for_element_to_be_clickable(self.remove_items)
         time.sleep(1)
         for item in self.get_elements(self.remove_items):
             item.click()
@@ -111,6 +120,7 @@ class ProductsPage(BasePage):
 
     def cart_checkout(self):
         self.click(self.cart_button)
+        # self.wait_for_element_to_be_clickable(self.remove_items)
         time.sleep(1)
         self.click(self.checkout)
         if self.wait_for_alert():
@@ -121,3 +131,36 @@ class ProductsPage(BasePage):
         
     def refresh(self):
         self.driver.refresh()
+
+    def get_cart_quantity(self):
+        time.sleep(1)
+        self.click(self.cart_button)
+        time.sleep(1)
+        cart_quantity = int(self.get_text(self.new_cart_quantity))
+        self.click(self.close_cart_button)
+        time.sleep(1)
+        return cart_quantity
+    
+    def remove_highest_priced_product(self):
+        cart_items = self.list_of_items_in_cart()
+        max_price_item = max([float(item[1].split()[1]) for item in cart_items])
+        time.sleep(1)
+        self.click(self.cart_button)
+        time.sleep(1)
+        for item in self.get_elements(self.all_cart_items):
+            if float((item.find_element(By.XPATH, 'div[2]/p').text).split()[1]) == max_price_item:
+                item_name = item.find_element(By.XPATH, "div[1]/p[1]").text
+                item_to_remove = item.find_element(By.XPATH, "div[1]/p[1]")
+                
+                ActionChains(self.driver).scroll_to_element(item_to_remove).perform()
+                self.driver.execute_script("arguments[0].scrollIntoView();", item_to_remove)
+                time.sleep(4)
+                self.driver.find_element(By.XPATH, "//p[normalize-space()='"+item_name+"']//parent::div//parent::div/button[@title='remove product from cart']").click()
+    
+        time.sleep(1)
+        self.click(self.close_cart_button)
+        time.sleep(1)
+        
+                
+            
+        
