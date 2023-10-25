@@ -152,7 +152,7 @@ class ProductsPage(BasePage):
                 item_name = item.find_element(By.XPATH, "div[1]/p[1]").text
                 item_to_remove = item.find_element(By.XPATH, "div[1]/p[1]")
                 
-                ActionChains(self.driver).scroll_to_element(item_to_remove).perform()
+                # ActionChains(self.driver).scroll_to_element(item_to_remove).perform()
                 self.driver.execute_script("arguments[0].scrollIntoView();", item_to_remove)
                 time.sleep(4)
                 self.driver.find_element(By.XPATH, "//p[normalize-space()='"+item_name+"']//parent::div//parent::div/button[@title='remove product from cart']").click()
